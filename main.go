@@ -20,7 +20,11 @@ type BlogPosting struct {
 		URL           string `json:"url"`
 		Author        string `json:"author"`
 		Headline      string `json:"headline"`
+		Image         struct {
+			URL string `json:"url"`
+		} `json:"image"`
 	} `json:"liveBlogUpdate"`
+	Content string
 }
 
 func main() {
