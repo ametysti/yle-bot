@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"mehf/yle-bot/db"
+	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -12,10 +14,16 @@ import (
 )
 
 func fetcher(dg *discordgo.Session) {
-	for range time.Tick(time.Second * 15) {
+	for range time.Tick(time.Minute * 5) {
 		data := GetYleNews()
 
 		publishedDate := db.GetRecentID()
+
+		heartbeatUrl := os.Getenv("HEARTBEAT_URL")
+
+		if strings.HasPrefix(heartbeatUrl, "https://") {
+			go http.Head(heartbeatUrl)
+		}
 
 		data.LiveBlogUpdate.ArticleBody = strings.ReplaceAll(data.LiveBlogUpdate.ArticleBody, "   ", "\n\n")
 		data.LiveBlogUpdate.ArticleBody = strings.ReplaceAll(data.LiveBlogUpdate.ArticleBody, "  ", "\n\n")
