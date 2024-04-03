@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"mehf/yle-bot/db"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -62,7 +64,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "!data" {
+	if m.Content == "!yle-data" {
 		data := GetYleNews()
 
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
@@ -70,5 +72,39 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			Description: data.LiveBlogUpdate.ArticleBody,
 			URL:         "https://yle.fi/a/74-20008814",
 		})
+	}
+
+	if m.Content == "!status" {
+		start := time.Now()
+		resp, _ := http.Get("https://yle.fi/a/74-20008814")
+		respTime := time.Since(start).Milliseconds()
+
+		embed := &discordgo.MessageEmbed{}
+
+		embed.URL = "https://yle.fi/a/74-20008814"
+
+		embed.Footer = &discordgo.MessageEmbedFooter{
+			Text: fmt.Sprintf("%dms", respTime),
+		}
+
+		if resp.StatusCode != 200 {
+			embed.Title = "❌ Ei saada yhteyttä"
+			embed.Description = "Emme nähtävästi saaneet yhteyttä Ylen sivuille."
+			embed.Color = 15548997
+		}
+
+		if resp.StatusCode == 200 && respTime > 1000 {
+			embed.Title = "ℹ️ Yhteys saatu"
+			embed.Description = "Saimme yhteyden Ylen sivuille mutta yhdistäminen oli hidasta."
+			embed.Color = 16776960
+		}
+
+		if resp.StatusCode == 200 && respTime < 1000 {
+			embed.Title = "✅ Yhteys saatu"
+			embed.Description = "Saimme yhteyden Ylen sivuille"
+			embed.Color = 5763719
+		}
+
+		s.ChannelMessageSendEmbed(m.ChannelID, embed)
 	}
 }

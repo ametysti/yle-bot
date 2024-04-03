@@ -9,6 +9,7 @@ services:
     environment:
       - TOKEN=
       - REDIS_URI=
+      - HEARTBEAT_URL=
     deploy:
       restart_policy:
         condition: on-failure
@@ -20,5 +21,5 @@ services:
       - '127.0.0.1:6413:6379'
       - '100.68.75.47:6413:6379'
     command: redis-server --save 20 1 --loglevel warning 
-    volumes: 
+    volumes:
       - ./data/redis:/data

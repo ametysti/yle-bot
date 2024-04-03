@@ -11,12 +11,15 @@ import (
 	"strings"
 	"time"
 
+	md "github.com/JohannesKaufmann/html-to-markdown"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/bwmarrin/discordgo"
 	"github.com/gocolly/colly"
 )
 
 func fetcher(dg *discordgo.Session) {
-	for range time.Tick(time.Minute * 1) {
+
+	for range time.Tick(time.Second * 10) {
 		data := GetYleNews()
 
 		publishedDate := db.GetRecentID()
@@ -62,6 +65,15 @@ func fetcher(dg *discordgo.Session) {
 }
 
 func GetYleNews() BlogPosting {
+	filterTags := md.Rule{
+		Filter: []string{"img", "iframe", "picture"},
+		Replacement: func(content string, selec *goquery.Selection, opt *md.Options) *string {
+			return md.String("")
+		},
+	}
+	converter := md.NewConverter("", true, nil)
+	converter.AddRules(filterTags)
+
 	url := "https://yle.fi/a/74-20008814"
 
 	// Create a new collector
@@ -84,11 +96,25 @@ func GetYleNews() BlogPosting {
 
 	c.OnHTML("div.post-content", func(e *colly.HTMLElement) {
 		if !foundHTML {
-			e.ForEach("p", func(_ int, p *colly.HTMLElement) {
-				if span := p.DOM.Find("span"); span.Length() > 0 {
-					jsonData.Content += span.Text() + "\n\n"
-				}
-			})
+			html, err := e.DOM.Html()
+
+			if err != nil {
+				fmt.Println("Failed to get html content", err)
+			}
+
+			mdText, err := converter.ConvertString(html)
+
+			// remove title from actual content because its already in the title lmao
+			// Not too sure if the Yle "short news" has sections that may use h2,
+			// so as a precaution just delete the section ONLY if the article name matches
+			jsonData.LiveBlogUpdate.Headline = strings.TrimSpace(jsonData.LiveBlogUpdate.Headline)
+			mdText = strings.ReplaceAll(mdText, fmt.Sprintf("## %s", jsonData.LiveBlogUpdate.Headline), "")
+
+			if err != nil {
+				fmt.Println("Failed to convert html to md", err)
+			}
+
+			jsonData.Content = mdText
 
 			foundHTML = true
 		}
