@@ -13,12 +13,13 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-
-  dragonfly:
-    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
-    ulimits:
-      memlock: -1
+  redis:
+    image: redis:7
+    container_name: yle-bot_redis
+    restart: always
     ports:
-      - 100.68.75.47:6413:6379
+      - '127.0.0.1:6413:6379'
+      - '100.68.75.47:6413:6379'
+    command: redis-server --save 20 1 --loglevel warning 
     volumes:
-      - ./data/dragonfly:/data
+      - ./data/redis:/data
