@@ -17,7 +17,7 @@ var (
 	})
 
 	BotLatency = promauto.NewHistogram(prometheus.HistogramOpts{
-		Name:      "bot_latency",
+		Name:      "websocket_latency",
 		Namespace: "yle_bot",
 		Help:      "Discord bot latency",
 	})
