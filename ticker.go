@@ -19,11 +19,9 @@ import (
 )
 
 func fetcher(dg *discordgo.Session) {
-	for range time.Tick(time.Second * 60) {
-		prom.BotLatency.Observe(dg.HeartbeatLatency().Seconds())
-	}
-
 	for range time.Tick(time.Second * 30) {
+		prom.BotLatency.Observe(dg.HeartbeatLatency().Seconds())
+
 		data := GetYleNews()
 
 		recentId := db.GetRecentID()
