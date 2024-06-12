@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"mehf/yle-bot/db"
-	"mehf/yle-bot/prometheus"
+	"mehf/yle-bot/prom"
 	"net/http"
 	"os"
 	"strings"
@@ -19,6 +19,9 @@ import (
 )
 
 func fetcher(dg *discordgo.Session) {
+	for range time.Tick(time.Second * 60) {
+		prom.BotLatency.Observe(dg.HeartbeatLatency().Seconds())
+	}
 
 	for range time.Tick(time.Second * 30) {
 		data := GetYleNews()
@@ -149,7 +152,7 @@ func GetYleNews() BlogPosting {
 		fmt.Println("Failed to visit URL:", err)
 	}
 
-	prometheus.YleLatency.Observe(float64(respTime))
+	prom.YleLatency.Observe(float64(respTime))
 
 	jsonData.Image = LDJsonData.Image
 
