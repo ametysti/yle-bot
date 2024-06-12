@@ -11,6 +11,8 @@ services:
       - REDIS_URI=
       - HEARTBEAT_URL=
       - NEWS_CHANNEL_ID=
+    ports:
+      - 127.0.0.1:3000:3000
     deploy:
       restart_policy:
         condition: on-failure

@@ -11,6 +11,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type BlogPosting struct {
@@ -35,6 +36,7 @@ type LDJson struct {
 }
 
 func main() {
+	host := "localhost:3000"
 	godotenv.Load(".env")
 	go db.Connect()
 
@@ -55,6 +57,14 @@ func main() {
 	}
 
 	go fetcher(dg)
+
+	http.Handle("/metrics", promhttp.Handler())
+
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		host = ":3000"
+	}
+
+	http.ListenAndServe(host, nil)
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)

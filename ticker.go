@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"mehf/yle-bot/db"
+	"mehf/yle-bot/prometheus"
 	"net/http"
 	"os"
 	"strings"
@@ -19,7 +20,7 @@ import (
 
 func fetcher(dg *discordgo.Session) {
 
-	for range time.Tick(time.Second * 10) {
+	for range time.Tick(time.Second * 30) {
 		data := GetYleNews()
 
 		recentId := db.GetRecentID()
@@ -140,9 +141,15 @@ func GetYleNews() BlogPosting {
 		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
 	})
 
-	if err := c.Visit(url); err != nil {
+	start := time.Now()
+	err := c.Visit(url)
+	respTime := time.Since(start).Seconds()
+
+	if err != nil {
 		fmt.Println("Failed to visit URL:", err)
 	}
+
+	prometheus.YleLatency.Observe(float64(respTime))
 
 	jsonData.Image = LDJsonData.Image
 
