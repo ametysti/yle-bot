@@ -14,19 +14,24 @@ import (
 )
 
 type BlogPosting struct {
-	ID             string `json:"@id"`
-	LiveBlogUpdate struct {
-		Type          string `json:"@type"`
-		DatePublished string `json:"datePublished"`
-		ArticleBody   string `json:"articleBody"`
-		URL           string `json:"url"`
-		Author        string `json:"author"`
-		Headline      string `json:"headline"`
-		Image         struct {
-			URL string `json:"url"`
-		} `json:"image"`
-	} `json:"liveBlogUpdate"`
+	ID      string `json:"@id"`
+	Title   string
 	Content string
+	Image   ImageObject
+}
+
+type ImageObject struct {
+	Type            string `json:"@type"`
+	Description     string `json:"description"`
+	CopyrightHolder string `json:"copyrightHolder"`
+	URL             string `json:"url"`
+	Keywords        string `json:"keywords"`
+}
+
+type LDJson struct {
+	ID      string      `json:"@id"`
+	Context string      `json:"@context"`
+	Image   ImageObject `json:"image"`
 }
 
 func main() {
@@ -68,20 +73,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		data := GetYleNews()
 
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-			Title:       data.LiveBlogUpdate.Headline,
-			Description: data.LiveBlogUpdate.ArticleBody,
-			URL:         "https://yle.fi/a/74-20008814",
+			Title:       data.Title,
+			Description: data.Content,
+			URL:         "https://yle.fi/uutiset",
 		})
 	}
 
 	if m.Content == "!status" {
 		start := time.Now()
-		resp, _ := http.Get("https://yle.fi/a/74-20008814")
+		resp, _ := http.Get("https://yle.fi/uutiset")
 		respTime := time.Since(start).Milliseconds()
 
 		embed := &discordgo.MessageEmbed{}
 
-		embed.URL = "https://yle.fi/a/74-20008814"
+		embed.URL = "https://yle.fi/uutiset"
 
 		embed.Footer = &discordgo.MessageEmbedFooter{
 			Text: fmt.Sprintf("%dms", respTime),

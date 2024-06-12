@@ -10,6 +10,7 @@ services:
       - TOKEN=
       - REDIS_URI=
       - HEARTBEAT_URL=
+      - NEWS_CHANNEL_ID=
     deploy:
       restart_policy:
         condition: on-failure
