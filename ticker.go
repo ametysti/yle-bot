@@ -160,7 +160,7 @@ func GetYleNews() BlogPosting {
 		fmt.Println("Failed to visit URL:", err)
 	}
 
-	prom.YleLatency.Set(respTime)
+	prom.YleLatency.Observe(respTime)
 
 	jsonData.Image = LDJsonData.Image
 
