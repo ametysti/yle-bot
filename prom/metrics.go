@@ -10,13 +10,13 @@ import (
 )
 
 var (
-	YleLatency = promauto.NewHistogram(prometheus.HistogramOpts{
+	YleLatency = promauto.NewGauge(prometheus.GaugeOpts{
 		Name:      "website_latency",
 		Namespace: "yle_bot",
 		Help:      "The total number of processed events",
 	})
 
-	BotLatency = promauto.NewHistogram(prometheus.HistogramOpts{
+	BotLatency = promauto.NewGauge(prometheus.GaugeOpts{
 		Name:      "websocket_latency",
 		Namespace: "yle_bot",
 		Help:      "Discord bot latency",

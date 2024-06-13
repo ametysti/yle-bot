@@ -23,7 +23,7 @@ func fetcher(dg *discordgo.Session) {
 		latency := dg.HeartbeatLatency()
 
 		if latency.Milliseconds() > 0 {
-			prom.BotLatency.Observe(latency.Seconds())
+			prom.BotLatency.Set(latency.Seconds())
 		}
 
 		data := GetYleNews()
@@ -160,7 +160,7 @@ func GetYleNews() BlogPosting {
 		fmt.Println("Failed to visit URL:", err)
 	}
 
-	prom.YleLatency.Observe(float64(respTime))
+	prom.YleLatency.Set(respTime)
 
 	jsonData.Image = LDJsonData.Image
 
