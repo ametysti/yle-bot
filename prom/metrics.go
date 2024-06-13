@@ -16,7 +16,7 @@ var (
 		Help:      "YLe website latency in seconds",
 	})
 
-	BotLatency = promauto.NewGauge(prometheus.GaugeOpts{
+	BotLatency = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name:      "websocket_latency_seconds",
 		Namespace: "yle_bot",
 		Help:      "Discord bot latency in seconds",

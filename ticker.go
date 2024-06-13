@@ -23,7 +23,7 @@ func fetcher(dg *discordgo.Session) {
 		latency := dg.HeartbeatLatency()
 
 		if latency.Milliseconds() > 0 {
-			prom.BotLatency.Set(latency.Seconds())
+			prom.BotLatency.Observe(latency.Seconds())
 		}
 
 		data := GetYleNews()
