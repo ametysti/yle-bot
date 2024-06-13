@@ -11,15 +11,15 @@ import (
 
 var (
 	YleLatency = promauto.NewGauge(prometheus.GaugeOpts{
-		Name:      "website_latency",
+		Name:      "website_latency_seconds",
 		Namespace: "yle_bot",
-		Help:      "The total number of processed events",
+		Help:      "YLe website latency in seconds",
 	})
 
 	BotLatency = promauto.NewGauge(prometheus.GaugeOpts{
-		Name:      "websocket_latency",
+		Name:      "websocket_latency_seconds",
 		Namespace: "yle_bot",
-		Help:      "Discord bot latency",
+		Help:      "Discord bot latency in seconds",
 	})
 )
 
