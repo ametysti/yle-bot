@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -31,11 +32,11 @@ func Connect() *redis.Client {
 func GetRecentID() string {
 	data, _ := rdb.Get(context.Background(), "id").Result()
 
-	return data
-
+	return strings.ToLower(data)
 }
 
 func SaveID(id string) bool {
+	id = strings.ToLower(id)
 	_, err := rdb.Set(context.Background(), "id", id, 0).Result()
 
 	return err != nil
