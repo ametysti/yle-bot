@@ -20,7 +20,7 @@ import (
 
 func fetcher(dg *discordgo.Session) {
 	for range time.Tick(time.Second * 30) {
-		prom.BotLatency.Observe(dg.HeartbeatLatency().Seconds())
+		prom.BotLatency.Observe(dg.HeartbeatLatency().Abs().Seconds())
 
 		data := GetYleNews()
 
@@ -136,6 +136,12 @@ func GetYleNews() BlogPosting {
 
 			jsonData.Content = mdText
 		})
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		if r.StatusCode != 200 {
+			fmt.Printf("Response failed with %d", r.StatusCode)
+		}
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
