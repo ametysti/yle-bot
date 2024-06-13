@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	YleLatency = promauto.NewGauge(prometheus.GaugeOpts{
+	YleLatency = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name:      "website_latency_seconds",
 		Namespace: "yle_bot",
 		Help:      "YLe website latency in seconds",
